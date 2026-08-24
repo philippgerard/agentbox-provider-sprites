@@ -1,0 +1,63 @@
+{
+  "name": "agentbox-provider-sprites",
+  "version": "0.1.0",
+  "description": "AgentBox provider for persistent hardware-isolated Sprites environments",
+  "author": {
+    "name": "Philipp C. Gérard",
+    "url": "https://github.com/philippgerard"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/philippgerard/agentbox-provider-sprites.git"
+  },
+  "homepage": "https://github.com/philippgerard/agentbox-provider-sprites#readme",
+  "bugs": {
+    "url": "https://github.com/philippgerard/agentbox-provider-sprites/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "scripts"
+  ],
+  "engines": {
+    "node": ">=20.10"
+  },
+  "agentbox": {
+    "providerApiVersion": 2
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --target node20 --no-splitting --dts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "prepublishOnly": "npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "@madarco/agentbox-provider-sdk": "^2.4.0",
+    "execa": "^9.5.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  },
+  "keywords": [
+    "agentbox",
+    "sprites",
+    "sandbox",
+    "provider",
+    "coding-agent"
+  ],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  }
+}
