@@ -1,6 +1,6 @@
 {
   "name": "agentbox-provider-sprites",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AgentBox provider for persistent hardware-isolated Sprites environments",
   "author": {
     "name": "Philipp C. Gérard",
