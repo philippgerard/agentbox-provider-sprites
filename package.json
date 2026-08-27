@@ -40,7 +40,7 @@
     "prepublishOnly": "npm run typecheck && npm test && npm run build"
   },
   "dependencies": {
-    "@madarco/agentbox-provider-sdk": "^2.4.0",
+    "@madarco/agentbox-provider-sdk": "^2.5.0",
     "execa": "^9.5.2"
   },
   "devDependencies": {

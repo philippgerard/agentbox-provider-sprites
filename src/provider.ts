@@ -13,7 +13,7 @@ import {
   SPRITES_RESOURCES,
   type SpritesBackendDependencies,
 } from './backend.js';
-import type { SpritesTransport } from './cli.js';
+import { BOX_USER, type SpritesTransport } from './cli.js';
 
 function spriteNameFor(box: BoxRecord): string {
   const spriteName = box.cloud?.sandboxId;
@@ -38,6 +38,18 @@ export function buildSpritesAttach(
       '--no-port-forward',
       ...(interactive ? ['--tty'] : []),
       '--',
+      // `sprite exec` runs as the platform's own `sprite` user. Everything
+      // AgentBox puts in the box belongs to BOX_USER instead: the credentials
+      // (~/.agentbox-creds -> ~/.claude/.credentials.json), the agent config,
+      // the ctl daemon's tmux server and /workspace. Attaching as `sprite`
+      // lands the agent in the wrong $HOME, where it finds no credentials and
+      // cannot see the supervisor's tmux sessions. Same hop `exec` takes.
+      'sudo',
+      '-n',
+      '-E',
+      '-u',
+      BOX_USER,
+      '-H',
       'bash',
       '-lc',
       inner,

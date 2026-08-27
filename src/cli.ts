@@ -14,6 +14,12 @@ const DEFAULT_MAX_BUFFER = 64 * 1024 * 1024;
 const PROXY_IDLE_MS = 60_000;
 const PROXY_PAUSE_POLL_MS = 250;
 const AGENTBOX_SERVICE_NAME = 'agentbox-ctl';
+/**
+ * The unprivileged user AgentBox owns inside every box. `sprite exec` runs as
+ * the platform's own `sprite` user, so every AgentBox-side command hops to this
+ * one — it owns /workspace, the ctl daemon, and the seeded agent credentials.
+ */
+export const BOX_USER = 'vscode';
 const AGENTBOX_SERVICE_SCRIPT =
   'while /usr/local/bin/agentbox-ctl status >/dev/null 2>&1; do sleep 2; done; ' +
   'rm -f /run/agentbox/ctl.sock; exec /usr/local/bin/agentbox-ctl daemon';
@@ -133,7 +139,7 @@ export function buildRemoteExecInvocation(
     command,
     '',
   ].join('\n');
-  const user = options.user === undefined ? 'vscode' : options.user;
+  const user = options.user === undefined ? BOX_USER : options.user;
   if (user === null) return { argv: ['bash', '-l', '-s', '--'], input: script };
 
   assertUser(user);
@@ -534,7 +540,7 @@ export class SpritesCli implements SpritesTransport {
           '-n',
           '-E',
           '-u',
-          'vscode',
+          BOX_USER,
           '-H',
           'bash',
           '-lc',
