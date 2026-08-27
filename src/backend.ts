@@ -4,6 +4,7 @@ import {
   type CloudState,
 } from '@madarco/agentbox-provider-sdk';
 import {
+  BOX_USER,
   SpritesCli,
   type SpriteDetails,
   type SpritesTransport,
@@ -144,7 +145,7 @@ export function createSpritesBackend(
 
     async exec(handle, command, options) {
       return cli.execShell(handle.sandboxId, command, {
-        user: options?.user ?? 'vscode',
+        user: options?.user ?? BOX_USER,
         ...(options?.cwd ? { cwd: options.cwd } : {}),
         ...(options?.env ? { env: options.env } : {}),
         ...(options?.attemptTimeoutMs !== undefined
@@ -157,12 +158,12 @@ export function createSpritesBackend(
       await cli.uploadFile(handle.sandboxId, localPath, remotePath);
       const ownership = await cli.execArgv(
         handle.sandboxId,
-        ['sudo', '-n', 'chown', 'vscode:vscode', '--', remotePath],
+        ['sudo', '-n', 'chown', `${BOX_USER}:${BOX_USER}`, '--', remotePath],
         30_000,
       );
       if (ownership.exitCode !== 0) {
         throw new Error(
-          `failed to assign uploaded file to vscode: ${ownership.stderr || ownership.stdout}`,
+          `failed to assign uploaded file to ${BOX_USER}: ${ownership.stderr || ownership.stdout}`,
         );
       }
     },

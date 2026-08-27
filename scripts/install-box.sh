@@ -103,6 +103,11 @@ install -d -m 0755 -o vscode -g vscode \
   /home/vscode/.agentbox-creds/claude \
   /home/vscode/.agentbox-creds/codex \
   /home/vscode/.agentbox-creds/opencode
+# `install -d` applies -o/-g to the leaf only, so the intermediate dirs it had
+# to create (/home/vscode/.local, .../share, .../.agentbox-creds) stay
+# root-owned — and AgentBox seeds write INTO them as vscode (OpenCode's
+# model-state seed failed with "mkdir: Permission denied" for exactly this).
+chown -R vscode:vscode /home/vscode/.local /home/vscode/.agentbox-creds
 sudo -u vscode -H ln -sfn /home/vscode/.agentbox-creds/claude/.credentials.json \
   /home/vscode/.claude/.credentials.json
 sudo -u vscode -H ln -sfn /home/vscode/.agentbox-creds/codex/auth.json \
@@ -113,13 +118,23 @@ sudo -u vscode -H ln -sfn /home/vscode/.claude/_claude.json /home/vscode/.claude
 sudo -u vscode -H cp /usr/local/share/agentbox/setup-guide.md \
   /home/vscode/.claude/skills/agentbox-setup/SKILL.md
 
+# The Sprite base image installs the coding agents (claude, codex, gemini,
+# cursor-agent) under the platform's own `sprite` user, whose home is 0750 —
+# `vscode` cannot even traverse it, so every agent is missing from the box
+# user's PATH. Open the traverse bit (not the read bit: `o+x` on a dir permits
+# path resolution, not listing) and put the dir on vscode's PATH below. This
+# grants nothing new — vscode already has passwordless sudo.
+if [ -d /home/sprite ]; then
+  chmod o+x /home/sprite
+fi
+
 cat > /etc/profile.d/agentbox.sh <<'PROFILE'
 if [ -r /etc/agentbox/box.env ]; then
   set -a
   . /etc/agentbox/box.env
   set +a
 fi
-PATH=/usr/local/bin:/home/vscode/.local/bin:/.sprite/bin:$(printf '%s' "$PATH" | sed -e 's#^/usr/local/bin:##' -e 's#:/usr/local/bin:#:#g' -e 's#:/usr/local/bin$##')
+PATH=/usr/local/bin:/home/vscode/.local/bin:/home/sprite/.local/bin:/.sprite/bin:$(printf '%s' "$PATH" | sed -e 's#^/usr/local/bin:##' -e 's#:/usr/local/bin:#:#g' -e 's#:/usr/local/bin$##')
 export PATH
 export COLORTERM=${COLORTERM:-truecolor}
 export DISABLE_AUTOUPDATER=${DISABLE_AUTOUPDATER:-1}

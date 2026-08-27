@@ -331,4 +331,15 @@ describe('remote execution and attach arguments', () => {
       '--tty',
     ]);
   });
+
+  it('attaches as the box user, not the platform sprite user', () => {
+    for (const spec of [
+      buildSpritesAttach('sprite', 'box', 'shell'),
+      buildSpritesAttach('sprite', 'box', 'agent', { detached: true }),
+      buildSpritesAttach('sprite', 'box', 'logs'),
+    ]) {
+      const after = spec.argv.slice(spec.argv.indexOf('--') + 1);
+      expect(after.slice(0, 6)).toEqual(['sudo', '-n', '-E', '-u', 'vscode', '-H']);
+    }
+  });
 });
