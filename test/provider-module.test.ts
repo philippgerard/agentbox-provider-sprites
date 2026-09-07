@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { SDK_API_VERSION } from '@madarco/agentbox-provider-sdk';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -6,6 +7,10 @@ import {
   setSpritesCredentials,
 } from '../src/credentials.js';
 import { providerModule } from '../src/index.js';
+
+const pkg = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { agentbox: { providerApiVersion: number } };
 
 const originalToken = process.env.SPRITE_TOKEN;
 
@@ -53,8 +58,15 @@ describe('Sprites credentials', () => {
 });
 
 describe('provider module', () => {
-  it('exports the API v2 provider, backend, diagnostics, and credential hooks', () => {
-    expect(SDK_API_VERSION).toBe(2);
+  // Asserts the invariant rather than a literal: AgentBox gates on this
+  // package's declared `agentbox.providerApiVersion`, so it has to match the SDK
+  // the package was actually built against. Pinning a number here instead just
+  // goes stale on every SDK major — as it did across v2 -> v4.
+  it('declares the provider API version of the SDK it is built against', () => {
+    expect(pkg.agentbox.providerApiVersion).toBe(SDK_API_VERSION);
+  });
+
+  it('exports the provider, backend, diagnostics, and credential hooks', () => {
     expect(providerModule.provider.name).toBe('sprites');
     expect(providerModule.backend?.name).toBe('sprites');
     expect(providerModule.doctorChecks).toBeTypeOf('function');
