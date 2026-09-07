@@ -50,9 +50,9 @@ install -m 0755 "$ASSET_DIR/agentbox-open" /usr/local/bin/agentbox-open
 ln -sfn /usr/local/bin/agentbox-open /usr/local/bin/xdg-open
 install -m 0755 "$ASSET_DIR/gh-shim" /usr/local/bin/gh
 install -m 0755 "$ASSET_DIR/git-shim" /usr/local/bin/git
-install -m 0755 "$ASSET_DIR/ntn-shim" /usr/local/bin/ntn
-ln -sfn /usr/local/bin/ntn /usr/local/bin/notion
-install -m 0755 "$ASSET_DIR/linear-shim" /usr/local/bin/linear
+# The notion/linear connectors were replaced by one generic host-tool shim,
+# symlinked per granted tool when the box starts.
+install -m 0755 "$ASSET_DIR/agentbox-tool-shim" /usr/local/bin/agentbox-tool-shim
 
 install -m 0644 "$ASSET_DIR/claude-managed-settings.json" /etc/claude-code/managed-settings.json
 install -m 0644 "$ASSET_DIR/agentbox-codex-hooks.json" /usr/local/share/agentbox/codex-hooks.json
