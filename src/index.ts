@@ -21,10 +21,13 @@ const spritesProvider = createSpritesProvider(spritesBackend, spritesCli);
 async function doctorChecks(): Promise<CheckResult[]> {
   const checks: CheckResult[] = [
     {
+      // Reported, not re-gated. AgentBox refuses a plugin whose
+      // `agentbox.providerApiVersion` is outside its supported set before this
+      // module is ever imported, so a second hardcoded comparison here can only
+      // go stale — which is exactly what it did across the v2 -> v4 change.
       label: 'provider SDK',
-      status: SDK_API_VERSION === 2 ? 'ok' : 'fail',
+      status: 'ok',
       detail: `API v${String(SDK_API_VERSION)}`,
-      ...(SDK_API_VERSION === 2 ? {} : { hint: 'Install a provider build matching AgentBox API v2.' }),
     },
   ];
 

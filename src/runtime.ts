@@ -1,23 +1,18 @@
 import { existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveSharedRuntimeAsset } from '@madarco/agentbox-provider-sdk';
+import {
+  resolveSharedRuntimeAsset,
+  SHARED_RUNTIME_ASSETS,
+} from '@madarco/agentbox-provider-sdk';
 import type { SpritesTransport } from './cli.js';
 
 const REMOTE_RUNTIME_DIR = '/tmp/agentbox-runtime';
-const SHARED_ASSETS = [
-  'ctl.cjs',
-  'agentbox-checkpoint-cleanup',
-  'agentbox-open',
-  'gh-shim',
-  'git-shim',
-  'ntn-shim',
-  'linear-shim',
-  'claude-managed-settings.json',
-  'agentbox-codex-hooks.json',
-  'opencode-agentbox-plugin.js',
-  'agentbox-setup-skill.md',
-] as const;
+// Taken from the SDK rather than pinned here. The CLI's shared-asset set moves
+// with the CLI - `ntn-shim` and `linear-shim` went away with the notion/linear
+// connectors, and `agentbox-tool-shim` replaced them - and any literal copy of
+// the list fails the whole create the moment one entry is renamed or dropped.
+const SHARED_ASSETS = SHARED_RUNTIME_ASSETS;
 
 export interface ResolvedRuntime {
   localFiles: string[];
